@@ -5,7 +5,7 @@
 - MySQL
 - MFC
 
-## 결과 화면
+## 구현 화면
 ![전체](https://user-images.githubusercontent.com/29061016/101756144-0dff7a00-3b19-11eb-838f-19c267926784.png)
 
 음원 정보를 보여주며, 상단의 drop box에서 ID, Name, Singer, Composer 중 하나를 선택하고 검색하고자 하는 키워드를 입력하면 해당 키워드를 포함하는 결과를 보여준다.
