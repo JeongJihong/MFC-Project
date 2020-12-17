@@ -8,47 +8,62 @@
 ## 주요 코드
 ```
 mysql_init(&mysql);
-	mysql_real_connect(&mysql, "localhost", "scott", "tiger", "musicmanager", 0, NULL, 0);
-	CString querystr = "select M_Id, M_Name, S_Name, C_Name, M_Year,M_Genre	from music "
-			"left join singer on music.S_Id = singer.S_Id "
-			"left join composer on music.C_Id = composer.C_Id order by M_Name";
-	mysql_query(&mysql, querystr);
+mysql_real_connect(&mysql, "localhost", "scott", "tiger", "musicmanager", 0, NULL, 0);
+CString querystr = "select M_Id, M_Name, S_Name, C_Name, M_Year,M_Genre	from music "
+		"left join singer on music.S_Id = singer.S_Id "
+		"left join composer on music.C_Id = composer.C_Id order by M_Name";
+mysql_query(&mysql, querystr);
 ```
 메인 화면에서 music table의 정보를 읽어오는데, left join을 활용하여 singer ID와 composer ID는 singer Name과 composer Name으로 출력하여 사용자들이 정보를 알기 쉽도록 한다.
-
-
-
-
 
 ```
 CString querystr = "select M_Id,M_Name, S_Name, C_Name, M_Year,M_Genre	from music	left join singer on music.S_Id = singer.S_Id "
 		"left join composer on music.C_Id = composer.C_Id";	// search edit에 아무것도 입력하지 않았을 경우
 
-	if (m_strSearch.GetLength() != 0)	// 검색창에 문자를 입력한 경우
-	{
-		if (m_ctrlCombo.GetCurSel() == 0) {			// ID로 Search
-			querystr.Format("select M_Id,M_Name, S_Name, C_Name, M_Year,M_Genre	from music	left join singer on music.S_Id = singer.S_Id " 
-				"left join composer on music.C_Id = composer.C_Id where M_ID like '%%%s%%'", m_strSearch);
-		}
-		else if (m_ctrlCombo.GetCurSel() == 1) {	// Name으로 Search
-			querystr.Format("select M_Id,M_Name, S_Name, C_Name, M_Year,M_Genre	from music	left join singer on music.S_Id = singer.S_Id "
-				"left join composer on music.C_Id = composer.C_Id where M_Name like '%%%s%%'", m_strSearch);
-		}
-		else if (m_ctrlCombo.GetCurSel() == 2) {	// Singer로 Search
-			querystr.Format("select M_Id,M_Name, S_Name, C_Name, M_Year,M_Genre	from music	left join singer on music.S_Id = singer.S_Id "
-				"left join composer on music.C_Id = composer.C_Id where S_Name like '%%%s%%'", m_strSearch);
-		}
-		else if (m_ctrlCombo.GetCurSel() == 3) {	// Composer로 Search
-			querystr.Format("select M_Id,M_Name, S_Name, C_Name, M_Year,M_Genre	from music	left join singer on music.S_Id = singer.S_Id "
-				"left join composer on music.C_Id = composer.C_Id where C_Name like '%%%s%%'", m_strSearch);
-		}
+if (m_strSearch.GetLength() != 0)	// 검색창에 문자를 입력한 경우
+{
+	if (m_ctrlCombo.GetCurSel() == 0) {		// ID로 Search
+		querystr.Format("select M_Id,M_Name, S_Name, C_Name, M_Year,M_Genre	from music	left join singer on music.S_Id = singer.S_Id " 
+			"left join composer on music.C_Id = composer.C_Id where M_ID like '%%%s%%'", m_strSearch);
 	}
+	else if (m_ctrlCombo.GetCurSel() == 1) {	// Name으로 Search
+		querystr.Format("select M_Id,M_Name, S_Name, C_Name, M_Year,M_Genre	from music	left join singer on music.S_Id = singer.S_Id "
+			"left join composer on music.C_Id = composer.C_Id where M_Name like '%%%s%%'", m_strSearch);
+	}
+	else if (m_ctrlCombo.GetCurSel() == 2) {	// Singer로 Search
+		querystr.Format("select M_Id,M_Name, S_Name, C_Name, M_Year,M_Genre	from music	left join singer on music.S_Id = singer.S_Id "
+			"left join composer on music.C_Id = composer.C_Id where S_Name like '%%%s%%'", m_strSearch);
+	}
+	else if (m_ctrlCombo.GetCurSel() == 3) {	// Composer로 Search
+		querystr.Format("select M_Id,M_Name, S_Name, C_Name, M_Year,M_Genre	from music	left join singer on music.S_Id = singer.S_Id "
+			"left join composer on music.C_Id = composer.C_Id where C_Name like '%%%s%%'", m_strSearch);
+	}
+}
 ```
 메인 화면에서 검색기능을 구현할 때 검색창에 입력된 문자의 길이를 통해 검색 단어가 입력되었는지 확인한다. 만약 검색할 단어가 입력되었으면, 커서의 위치로 검색할 키워드를 찾는다.
 
 ```
+querystr.Format("insert into Music values ('%s', '%s', '%s', '%s', '%s', '%s')", m_strId, m_strName, m_strSinger, m_strComposer, m_strRd, m_strGenre);
+```
+음원에 대한 정보를 입력하면, 쿼리문을 사용하여 테이블에 입력한다.
 
 ```
+querystr.Format("update Music set M_Name = '%s', S_Id = '%s', C_Id = '%s', M_Year = '%s', M_Genre = '%s' where M_Id = '%s'",
+	m_strName, m_strSinger, m_strComposer, m_strRd, m_strGenre, m_strId);
+```
+음원의 정보들을 수정하고, 쿼리문을 사용하여 데이터를 업데이트한다.
+
+```
+POSITION pos = m_ListCtrl1.GetFirstSelectedItemPosition();
+while (pos)
+{
+	int nItem = m_ListCtrl1.GetNextSelectedItem(pos);
+	CString str = m_ListCtrl1.GetItemText(nItem, 0);
+	querystr.Format("delete from Music where M_Id = '%s'", str);
+	mysql_query(&mysql, querystr);
+}
+```
+음원의 ID를 이용하여 삭제할 데이터를 지정하고, 쿼리문을 사용하여 데이터를 삭제한다.
 
 ## 구현 화면
 ![전체](https://user-images.githubusercontent.com/29061016/101756144-0dff7a00-3b19-11eb-838f-19c267926784.png)
