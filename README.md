@@ -16,6 +16,10 @@ mysql_init(&mysql);
 ```
 메인 화면에서 music table의 정보를 읽어오는데, left join을 활용하여 singer ID와 composer ID는 singer Name과 composer Name으로 출력하여 사용자들이 정보를 알기 쉽도록 한다.
 
+
+
+
+
 ```
 CString querystr = "select M_Id,M_Name, S_Name, C_Name, M_Year,M_Genre	from music	left join singer on music.S_Id = singer.S_Id "
 		"left join composer on music.C_Id = composer.C_Id";	// search edit에 아무것도 입력하지 않았을 경우
